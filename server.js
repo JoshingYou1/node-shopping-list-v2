@@ -43,14 +43,29 @@ app.post('/shopping-list', jsonParser, (req, res) => {
     }
   }
 
-  const item = ShoppingList.create(req.body.name, req.body.budget);
-  res.status(201).json(item);
+  const shoppingListItem = ShoppingList.create(req.body.name, req.body.budget);
+  res.status(201).json(shoppingListItem);
 });
 
 
 app.get('/recipes', (req, res) => {
   res.json(Recipes.get());
 })
+
+app.post("/recipes", jsonParser, (req, res) => {
+  const requiredRecipeFields = ["name", "ingredients"];
+  for (let i = 0; i < requiredRecipeFields.length; i++) {
+    const reqField = requiredRecipeFields[i];
+    if (!(reqField in req.body)) {
+      const errorMessage = `Sorry, you forgot to include \"${reqField}\" in the request body`;
+      console.error(errorMessage);
+      return res.status(401).send(errorMessage);
+    }
+  }
+
+  const recipeItem = Recipes.create(req.body.name, req.body.ingredients);
+  res.status(201).json(recipeItem);
+});
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Your app is listening on port ${process.env.PORT || 8080}`);
